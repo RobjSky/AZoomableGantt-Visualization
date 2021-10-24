@@ -48,7 +48,6 @@
                                     },
                                     {
                                         style: $WT.TWOCOLUMN,
-                                        disabled: this.getHost().getProperty('showInfobox') === "false",
                                         items: [{
                                                 style: $WT.LABEL,
                                                 width: "30%",
@@ -81,6 +80,7 @@
                                             },
                                             {
                                                 style: $WT.FILLGROUP,
+                                                disabled: this.getHost().getProperty('showInfobox') === "false",
                                                 width: "70%",
                                                 propertyName: "InfoboxFillColor",
                                             }
@@ -296,8 +296,7 @@
                                         disabled: this.getHost().getProperty('showInfobox') === "false",
                                         propertyName: "displayImage",
                                         labelText: "Image from 5th Attribute"
-                                    },
-                                    {
+                                    }, {
                                         style: $WT.TWOCOLUMN,
                                         items: [{
                                             style: $WT.LABEL,
@@ -381,62 +380,53 @@
                                     items: [{
                                             style: $WT.LABEL,
                                             labelText: "Thresholds / Heatmap"
-                                        },
-                                        {
+                                        }, {
                                             style: $WT.CHECKBOXANDLABEL,
                                             propertyName: "showThreshold",
                                             labelText: "Show Thresholds"
-                                        },
-                                        {
+                                        }, {
                                             style: $WT.TWOCOLUMN,
                                             disabled: this.getHost().getProperty('showThreshold') === "false",
                                             items: [{
                                                     style: $WT.LABEL,
                                                     width: "30%",
                                                     labelText: "min"
-                                                },
-                                                {
+                                                }, {
                                                     style: $WT.FILLGROUP,
                                                     width: "70%",
                                                     propertyName: "minThresholdColor",
                                                 }
                                             ]
-                                        },
-                                        {
+                                        }, {
                                             style: $WT.TWOCOLUMN,
                                             disabled: this.getHost().getProperty('showThreshold') === "false",
                                             items: [{
                                                     style: $WT.LABEL,
                                                     width: "30%",
                                                     labelText: "max"
-                                                },
-                                                {
+                                                }, {
                                                     style: $WT.FILLGROUP,
                                                     width: "70%",
                                                     propertyName: "maxThresholdColor",
                                                 }
                                             ]
-                                        },
-                                        {
+                                        }, {
                                             style: $WT.LABEL,
                                             width: "30%",
                                             labelText: "Position262"
-                                        },
-                                        {
+                                        }, {
                                             style: $WT.PULLDOWN,
                                             width: "70%",
                                             propertyName: "threshold12345",
                                             items: [{
                                                     name: "vertical1",
                                                     value: "vertical1"
-                                                },
-                                                {
+                                                }, {
                                                     name: "horizontal1",
                                                     value: "horizontal1"
                                                 }
                                             ]
-                                        },
-                                        {
+                                        }, {
                                             //minThresholdValue
                                             style: $WT.TWOCOLUMN,
                                             disabled: this.getHost().getProperty('clickTask') === "false",
@@ -444,15 +434,13 @@
                                                     style: $WT.LABEL,
                                                     width: "30%",
                                                     labelText: "min value"
-                                                },
-                                                {
+                                                }, {
                                                     style: $WT.TEXTBOX,
                                                     width: "70%",
                                                     propertyName: "minThresholdValue",
                                                 }
                                             ]
-                                        },
-                                        {
+                                        }, {
                                             //maxThresholdValue
                                             style: $WT.TWOCOLUMN,
                                             disabled: this.getHost().getProperty('clickTask') === "false",
@@ -460,8 +448,7 @@
                                                     style: $WT.LABEL,
                                                     width: "30%",
                                                     labelText: "max value"
-                                                },
-                                                {
+                                                }, {
                                                     style: $WT.TEXTBOX,
                                                     width: "70%",
                                                     propertyName: "maxThresholdValue",
@@ -470,41 +457,61 @@
                                         },
                                     ]
                                 },
-                                //Grid Lines
+                                //Grid and Axis Lines
                                 {
                                     style: $WT.EDITORGROUP,
                                     items: [{
                                             style: $WT.LABEL,
                                             labelText: "Grid Lines"
-                                        },
-                                        {
+                                        }, {
                                             style: $WT.TWOCOLUMN,
                                             items: [{
                                                     style: $WT.LABEL,
                                                     width: "30%",
                                                     labelText: "Stroke-X"
-                                                },
-                                                {
+                                                }, {
                                                     style: $WT.FILLGROUP,
                                                     width: "70%",
                                                     propertyName: "amountStrokeXColor",
                                                 }
                                             ]
-                                        },
-                                        {
+                                        }, {
                                             style: $WT.TWOCOLUMN,
                                             items: [{
                                                     style: $WT.LABEL,
                                                     width: "30%",
                                                     labelText: "Stroke-Y"
-                                                },
-                                                {
+                                                }, {
                                                     style: $WT.FILLGROUP,
                                                     width: "70%",
                                                     propertyName: "amountStrokeYColor",
                                                 }
                                             ]
-                                        }
+                                        }, {
+                                            style: $WT.TWOCOLUMN,
+                                            items: [{
+                                                    style: $WT.LABEL,
+                                                    width: "30%",
+                                                    labelText: "Axisline-X"
+                                                }, {
+                                                    style: $WT.FILLGROUP,
+                                                    width: "70%",
+                                                    propertyName: "axisXColor",
+                                                }
+                                            ]
+                                        }, {
+                                            style: $WT.TWOCOLUMN,
+                                            items: [{
+                                                    style: $WT.LABEL,
+                                                    width: "30%",
+                                                    labelText: "Axisline-Y"
+                                                }, {
+                                                    style: $WT.FILLGROUP,
+                                                    width: "70%",
+                                                    propertyName: "axisYColor",
+                                                }
+                                            ]
+                                        },
                                     ]
                                 },
                                 //axis lables
@@ -513,15 +520,13 @@
                                     items: [{
                                             style: $WT.LABEL,
                                             labelText: "Axis Format"
-                                        },
-                                        {
+                                        }, {
                                             style: $WT.TWOCOLUMN,
                                             items: [{
                                                     style: $WT.LABEL,
                                                     width: "30%",
                                                     labelText: "font color"
-                                                },
-                                                {
+                                                }, {
                                                     style: $WT.FILLGROUP,
                                                     width: "70%",
                                                     propertyName: "fontColor",
@@ -536,12 +541,11 @@
                                     items: [{
                                             style: $WT.LABEL,
                                             labelText: "Clickable Tasks"
-                                        },
-                                        {
+                                        }, {
                                             style: $WT.CHECKBOXANDLABEL,
                                             propertyName: "clickTask",
                                             labelText: "Clickable Tasks"
-                                        },{
+                                        }, {
                                         //clickcolor
                                                 style: $WT.CHECKBOXANDLABEL,
                                                 disabled: this.getHost().getProperty('clickTask') === "false",
@@ -569,8 +573,7 @@
                                                     style: $WT.LABEL,
                                                     width: "30%",
                                                     labelText: "stroke color on click"
-                                                },
-                                                {
+                                                }, {
                                                     style: $WT.FILLGROUP,
                                                     width: "70%",
                                                     propertyName: "clickColorStroke",
@@ -584,8 +587,7 @@
                                                     style: $WT.LABEL,
                                                     width: "30%",
                                                     labelText: "stroke width"
-                                                },
-                                                {
+                                                }, {
                                                     style: $WT.STEPPER,
                                                     width: "70%",
                                                     propertyName: "strokeWidth",
@@ -600,21 +602,17 @@
                     // Tab amCharts Timeline Format
                     {
                         name: 'Help and Notes',
-                        value: [
-                            {
+                        value: [{
                                 style: $WT.LABEL,
                                 labelText: "Version 1.297    (GitHub:RobjSky)"
-                            },
-                            {
+                            }, {
                                 style: $WT.CHECKBOXANDLABEL,
                                 propertyName: "showDebugMsgs",
                                 labelText: "Show Msg"
-                            },
-                            {
+                            }, {
                                 style: $WT.LABEL,
                                 labelText: "Help: Date Start and End Function! This function assumes first and second input to be of the date- or datetime-format! Date needs to be in the form of dd.mm.yy(yy) DateTime needs to be in the form of dd.mm.yy(yy) hh:mm:ss"
-                            },
-                        ]
+                            },]
                     }
                 ];
             }

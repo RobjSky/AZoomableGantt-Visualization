@@ -40,10 +40,8 @@
             reuseDOMNode: false,
 
             /** TODOs:
-             * Threshold with attributes(heat rule 's minValue and maxValue properties. - https://codepen.io/team/amcharts/pen/pLOXgO)
-             * threshold maybe just with 1 Attribute (alert red)
-             * (change boolean from string to boolean)
              * accept not only date and datetime but also time. first changes have been made to prepareData().case-statement "time"
+             * positionInfobox in vertical either at the top or bottom.
              */
 
             plot: function () {
@@ -88,6 +86,8 @@
                     maxThresholdColor: {fillColor: "#830c0c", fillAlpha: "100"},
                     amountStrokeXColor: {fillColor: "#A3A3A3", fillAlpha: "50"},
                     amountStrokeYColor: {fillColor: "#A3A3A3", fillAlpha: "50"},
+                    axisXColor: {fillColor: "#ebebeb", fillAlpha: "100"},
+                    axisYColor: {fillColor: "#ebebeb", fillAlpha: "100"},
                     weekendFillColor: {fillColor: "#000000", fillAlpha: "20"},
                     metricFormat: "#,###.00",
                     showDebugMsgs: 'false',
@@ -122,17 +122,6 @@
                 }
                 chart2.data = datapool.rows;
 
-/* FIXME DELETE ME
-                if (startAttrIsDate == "datetime") {
-                    var formattedDateTime = 'dd.MM.yyyy HH:mm';
-                    var valDateXFormatted = 'HH:mm';
-                } else if (startAttrIsDate == "date") {
-                    var formattedDateTime = 'dd.MM.yyyy';
-                    var valDateXFormatted = 'dd.MM.yyyy';
-                }
-*/
-
-
                 // Set Default Colors
                 chart2.colors.list = [
                     am4core.color("#eac566"),
@@ -157,11 +146,15 @@
                 categoryAxis.renderer.grid.template.stroke = am4core.color(me.getProperty("amountStrokeYColor").fillColor);
                 categoryAxis.renderer.grid.template.strokeOpacity = me.getProperty("amountStrokeYColor").fillAlpha * 0.01;
                 categoryAxis.renderer.labels.template.fill = am4core.color(me.getProperty("fontColor").fillColor);
+                categoryAxis.renderer.line.stroke = am4core.color(me.getProperty("axisYColor").fillColor);
+                categoryAxis.renderer.line.strokeOpacity = me.getProperty("axisYColor").fillAlpha * 0.01;
 
                 // date-based X-Axis:
                 (me.getProperty("showDebugMsgs") == 'true') ? window.alert('startAttrIsDate: ' + startAttrIsDate) : 0;
                 if (startAttrIsDate == 'false') {
-                    window.alert('This wont work. Category-based AttrIsDate = ' + startAttrIsDate)
+                    window.alert('This wont work. Category-based AttrIsDate = ' + startAttrIsDate);
+                    console.log('This wont work. Category-based AttrIsDate = ' + startAttrIsDate);
+                    return;
                 } else {
                     var dateAxis = chart2.xAxes.push(new am4charts.DateAxis());
                     dateAxis.renderer.grid.template.location = 0;
@@ -173,6 +166,8 @@
                     dateAxis.renderer.grid.template.stroke = am4core.color(me.getProperty("amountStrokeXColor").fillColor);
                     dateAxis.renderer.grid.template.strokeOpacity = me.getProperty("amountStrokeXColor").fillAlpha * 0.01;
                     dateAxis.renderer.labels.template.fill = am4core.color(me.getProperty("fontColor").fillColor);
+                    dateAxis.renderer.line.stroke = am4core.color(me.getProperty("axisXColor").fillColor);
+                    dateAxis.renderer.line.strokeOpacity = me.getProperty("axisXColor").fillAlpha * 0.01;
                     // Set date label formatting (https://www.amcharts.com/docs/v4/concepts/axes/date-axis/#Setting_date_formats)
                     dateAxis.periodChangeDateFormats.setKey("hour", "[bold]dd.MMM[/]\nEEE");
                     dateAxis.periodChangeDateFormats.setKey("day", "[bold]dd.MMM[/]");
@@ -229,9 +224,6 @@
                 };
                 //FIXME
                 if (me.getProperty("showToolTip") === 'true') {
-                    //series1.columns.template.tooltipText = "just testing. [bold]{" + datapool.attrs[3] + "}[/]: \n{openDateX.formatDate(formattedDateTime)} - {dateX.formatDate(valDateXFormatted)}" + metrics4tooltip;
-                    //series1.columns.template.tooltipText = "just testing2. [bold]{" + datapool.attrs[3] + "}[/]: \n{openDateX} - {dateX}" + metrics4tooltip;
-                    //series1.columns.template.tooltipText =   "3: [bold]{" + datapool.attrs[3] + "}[/]: \n" + seriesToolTipFormat + metrics4tooltip;
                     series1.columns.template.tooltipText = "{categoryY}\n[bold]{task}[/]: \n" + seriesToolTipFormat + metrics4tooltip;
                 }
 
@@ -310,19 +302,44 @@
                     });
                 }
 
-
-                chart2.scrollbarX = new am4core.Scrollbar();
+                //NOTE Scrollbar ---------------------------------//
                 chart2.cursor = new am4charts.XYCursor();
+                
+                chart2.zoomOutButton.background.fill = am4core.color(me.getProperty("InfoboxFillColor").fillColor);
+                //chart2.zoomOutButton.background.fill = am4core.color("#c3c3c3");
+                //chart2.zoomOutButton.background.stroke = am4core.color("red");
+                chart2.zoomOutButton.background.stroke = am4core.color(me.getProperty("fontColor").fillColor);
+                chart2.zoomOutButton.background.strokeWidth = 1;
+                chart2.zoomOutButton.background.strokeOpacity = 1;
 
+                //chart2.zoomOutButton.icon.stroke = am4core.color("#f0f0f0");
+                chart2.zoomOutButton.icon.stroke = am4core.color(me.getProperty("fontColor").fillColor);
+                chart2.zoomOutButton.icon.strokeWidth = 2;
+                chart2.zoomOutButton.background.states.getKey("hover").properties.fill = am4core.color("#5A5F73");
+                
+                if (me.getProperty("displayXYChartScrollbar") === 'false') {
+                    // scrollbarX without preview
+                    chart2.scrollbarX = new am4core.Scrollbar();
+                    // Customize scrollbar background
+                    chart2.scrollbarX.background.fill = am4core.color("#c3c3c3");
+                    chart2.scrollbarX.background.fillOpacity = 0.2;
+                    chart2.scrollbarX.background.stroke = am4core.color("#f0f0f0");
+                    chart2.scrollbarX.background.strokeWidth = 1;
+                    chart2.scrollbarX.minHeight = 6;
+                    // Customize scrollbar thumb
+                    chart2.scrollbarX.thumb.background.fill = am4core.color("#b4b4b4");
+                    chart2.scrollbarX.thumb.background.fillOpacity = 0.9;
+                    chart2.scrollbarX.thumb.height = 50;
 
-
-                // Create a horizontal scrollbar with preview and place it underneath the date axis
-                if (me.getProperty("displayXYChartScrollbar") === 'true') {
+                    customizeGrip(chart2.scrollbarX.startGrip);
+                    customizeGrip(chart2.scrollbarX.endGrip);
+                } else if (me.getProperty("displayXYChartScrollbar") === 'true') {
                     series1.show(); // hardcoded reference for series1
+                    // scrollbarX with preview
                     chart2.scrollbarX = new am4charts.XYChartScrollbar();
                     chart2.scrollbarX.minHeight = 40;
                     // Customize scrollbar background, when hovered
-                    chart2.scrollbarX.background.fill = am4core.color("#c4c4c4");
+                    chart2.scrollbarX.background.fill = am4core.color("#c3c3c3");
                     chart2.scrollbarX.background.fillOpacity = 0.2;
                     // Customize scrollbar background, when unhovered
                     chart2.scrollbarX.thumb.background.fill = am4core.color("#b0b0b0");
@@ -330,40 +347,49 @@
                     chart2.scrollbarX.series.push(series1);
                     chart2.scrollbarX.parent = chart2.bottomAxesContainer;
                     chart2.scrollbarX.scrollbarChart.series.getIndex(0).fillOpacity = 0.5;
-                    chart2.scrollbarX.scrollbarChart.plotContainer.filters.clear(); // remove desaturation
-                    //chart2.scrollbarX.scrollbarChart.plotContainer.filters.DesaturateFilter.saturation = 0.5;
+                    // show colors, remove desaturation
+                    //chart2.scrollbarX.scrollbarChart.plotContainer.filters.clear();
+
                     customizeGrip(chart2.scrollbarX.startGrip);
                     customizeGrip(chart2.scrollbarX.endGrip);
                 }
 
+
                 //NOTE Scrollbar - customizeGrip() --------------------------------//
-                // Style scrollbar
+                // Style scrollbar start and end grip
                 function customizeGrip(grip) {
                     // Remove default grip image
                     grip.icon.disabled = true;
-
                     // Disable background
                     grip.background.disabled = true;
-
-                    // Add rotated rectangle as bi-di arrow
                     var img = grip.createChild(am4core.Rectangle);
-                    img.width = 10;
-                    img.height = 10;
-                    img.fill = am4core.color("#999");
-                    img.rotation = 45;
-                    img.align = "center";
-                    img.valign = "middle";
 
-                    // Add vertical bar
-                    var line = grip.createChild(am4core.Rectangle);
-                    line.height = 40;
-                    line.width = 2;
-                    line.fill = am4core.color("#999");
-                    line.align = "center";
-                    line.valign = "middle";
+                    if (me.getProperty("displayXYChartScrollbar") === 'true') {
+                        // Add rotated rectangle as bi-di arrow
+                        img.width = 10;
+                        img.height = 10;
+                        img.fill = am4core.color("#999");
+                        img.rotation = 45;
+                        img.align = "center";
+                        img.valign = "middle";
+
+                        // Add vertical bar
+                        var line = grip.createChild(am4core.Rectangle);
+                        line.height = 40;
+                        line.width = 2;
+                        line.fill = am4core.color("#999");
+                        line.align = "center";
+                        line.valign = "middle";
+                    } else {
+                        // Add rectangle as vertical line
+                        img.width = 3;
+                        img.height = 18;
+                        img.fill = am4core.color("#999");
+                        img.rotation = 0;
+                        img.align = "center";
+                        img.valign = "middle";
+                    }
                 }
-
-
 
                 //NOTE InfoBox - Generate Infobox for static tooltip
                 if (me.getProperty("showInfobox") === 'true') {
@@ -371,6 +397,7 @@
                     info.padding(10, 10, 10, 10);
                     info.background.fill = am4core.color("#000");
                     info.background.fillOpacity = 0.1;
+                    
                     info.layout = "vertical";
 
                     let title = info.createChild(am4core.Label);
@@ -388,8 +415,9 @@
                         info.height = am4core.percent(100);
                         info.margin(25, 10, 25, 25);
                         info.background.fill = am4core.color(me.getProperty("InfoboxFillColor").fillColor);
+                        info.background.fillOpacity = me.getProperty("InfoboxFillColor").fillAlpha * 0.01;
                         info.background.stroke = am4core.color(me.getProperty("InfoboxStrokeColor").fillColor);
-                        info.background.fillOpacity = me.getProperty("InfoboxLabelFillColor").fillAlpha * 0.01;
+                        info.background.strokeOpacity = me.getProperty("InfoboxStrokeColor").fillAlpha * 0.01;
                         title.truncate = false;
                         title.wrap = true;
                         title.width = am4core.percent(100);
@@ -498,18 +526,21 @@
 
                     //NOTE Hovering - Set up hovering events
                     series1.columns.template.events.on("over", function (ev) {
-                        if (me.getProperty("displayImage") == "true" && (datapool.attrs[4]) && me.getProperty("positionInfobox") == "horizontal") {
-                            // Update Image
-                            var imgName = ev.target.dataItem.imgName;
-                            img.href = imgPrefix + imgName + imgSuffix;
+                        if (me.getProperty("positionInfobox") == "horizontal") {
                             // Update labels in Infobox
                             title.text = "[bold]" + ev.target.dataItem.task + "[/]\n";
                             valOpenDateX.text = chart2.dateFormatter.format(ev.target.dataItem.openDateX, formattedDateTime);
                             valDateX.text = chart2.dateFormatter.format(ev.target.dataItem.dateX, valDateXFormatted);
                             valCategoryY.text = ev.target.dataItem.categoryY;
                             for (var i = 0; i < numOfMetrics; i++) {
-                                 var metricname = "valueY" + i;
-                                 window['valMetric' + i].text = ev.target.dataItem[metricname];
+                                var metricname = "valueY" + i;
+                                window['valMetric' + i].text = ev.target.dataItem[metricname];
+                            }
+                            // Update Image
+                            if (me.getProperty("displayImage") == "true" && (datapool.attrs[4])) {
+                                var imgName = ev.target.dataItem.imgName;
+                                img.href = imgPrefix + imgName + imgSuffix;
+                                // TODO poster als infobox.background info.background = 
                             }
                         } else {
                             // Update labels in vertical
@@ -517,7 +548,8 @@
                             label.text = chart2.dateFormatter.format(ev.target.dataItem.openDateX, formattedDateTime) + " - " + chart2.dateFormatter.format(ev.target.dataItem.dateX, valDateXFormatted) + sepa;
                             label.text += ev.target.dataItem.categoryY + sepa;
                             label.text += datapool.cols[0] + ": " + chart2.numberFormatter.format(ev.target.dataItem.valueY, "#,###.00");
-                            label.fill = ev.target.fill;
+                            //label.fill = ev.target.fill;
+                            label.fill = am4core.color(me.getProperty("fontColor").fillColor);
 
                             for (var i = 1; i < numOfMetrics; i++) {
                                 var metricname = "valueY" + i;
@@ -531,44 +563,46 @@
                  * https://stackoverflow.com/questions/51477177/how-to-add-a-click-hit-event-for-lineseries-in-amcharts-4
                  * https://stackoverflow.com/questions/64452378/how-can-i-make-my-amchart4-segments-clickable
                  * https://stackoverflow.com/questions/55021098/select-single-column-in-amcharts-4
+                 * states: https://www.amcharts.com/docs/v4/concepts/states/
                 */
                  if (me.getProperty("clickTask") == "true") {
-                      var columnTemplate = series1.columns.template;
+                      let columnTemplate = series1.columns.template;
                       columnTemplate.strokeWidth = 2;
                       columnTemplate.strokeOpacity = 1;
 
+                      // Indicates if element can be toggled on and off by subsequent clicks/taps. Togglable element will alternate its isActive property between true and false with each click.
                       columnTemplate.togglable = true;
-                      var activeState = columnTemplate.states.create("active");
-                      if (me.getProperty("fillTask") == "true") {
-                          //activeState.properties.fill = am4core.color("#E94F37"); //series.fill.brighten(1);
-                          activeState.properties.fill = am4core.color(me.getProperty("clickColorFill").fillColor);
-                          activeState.properties.fillOpacity = me.getProperty("clickColorFill").fillAlpha * 0.01;
-                      }
-                      //activeState.properties.strokeWidth = 8;
+                      let activeState = columnTemplate.states.create("active");
                       activeState.properties.strokeWidth = me.getProperty("strokeWidth");
                       activeState.properties.stroke = am4core.color(me.getProperty("clickColorStroke").fillColor);
                       //activeState.filters.push(new am4core.DropShadowFilter());
+                      if (me.getProperty("fillTask") == "true") {
+                          activeState.properties.fill = am4core.color(me.getProperty("clickColorFill").fillColor);
+                          activeState.properties.fillOpacity = me.getProperty("clickColorFill").fillAlpha * 0.01;
+                      }
 
                       // Only one column active at a time
                       columnTemplate.events.on("hit", function (event) {
                           series1.columns.each(function (column) {
                               //alert("Task: " + JSON.stringify(event.target.dataItem.task) + " index: " + JSON.stringify(event.target.dataItem.task.index));
                               //alert("Taskcol: " + JSON.stringify(column.dataItem.task) + " index: " + JSON.stringify(column.dataItem.task.index));
-                              if (column !== event.target) {
+                              //if (column !== event.target) {
+                              if (column != event.target) {
+                                  column.setState("default");
                                   if (column.dataItem.task == event.target.dataItem.task) {
-                                      //alert("true: " + JSON.stringify(column.dataItem.task) + " // " + JSON.stringify(event.target.dataItem.task));
-                                      column.setState("default");
-                                      column.isActive = true;
+                                      //alert("column: " + JSON.stringify(column.dataItem.task) + " //event: " + JSON.stringify(event.target.dataItem.task));
+                                      //column.setState("default");
+                                      //column.isActive = true;
+                                      column.isActive = !column.isActive;
                                   } else {
                                       //alert("no match");
-                                      column.setState("default");
+                                      //column.setState("default");
                                       column.isActive = false;
                                   }
                               }
                           })
                       });
-                 }
-
+                 };
 
 
 
@@ -713,9 +747,11 @@
                             //(i < 1) ? window.alert('conv2date b4: ' + conv2Date): 0;
                             //(i < 1) ? window.alert('format b4: ' + me.getProperty("dateTimeFormat")): 0;
                             
-                            var fragOfTime = conv2Date.split(/[\s,-/\\:]+/), // split by multiple chars ( \s = whitespace | ,-/ = Range from , to / char code 44 to char code 47 | \\ = \ | : = : | []+ = 1 or more)
+                            var fragOfTime = conv2Date.split(/[\s,-/\\:]+/), // split by multiple chars ( \s = [whitespace] | ,-/ = [, - . /]Range charcode 44 to charcode 47 | \\ = [\] | : = [:] | []+ = 1 or more)
                                 yyyy, mm, dd;
-                            //window.alert('fragoftume: ' + fragOfTime);
+                            if (fragOfTime[2].length == 2) {
+                                fragOfTime[2] = '20' + fragOfTime[2];
+                            }
 
                             switch (me.getProperty("dateTimeFormat")) {
                                 case "dd-mm-yyyy":
@@ -740,12 +776,8 @@
                                     break;
                             };
 
-                            if (fragOfTime[2].length == 2) {
-                                fragOfTime[2] = '20' + fragOfTime[2];
-                            }
                             //(i < 1) ? window.alert('y: ' + yyyy + ' _m: ' + mm + ' _d: ' + dd + '\nh: ' + fragOfTime[3] + ' : min: ' + fragOfTime[4]): 0;
 
-                            // FIXME needed:??? formattedDateTime AND valDateXFormatted
                             //check if date (d,m,y) or datetime(d,m,y,h,m,s)
                             if (fragOfTime.length === 3) {
                                 // Note: JavaScript counts months from 0 to 11. January is 0.
@@ -754,65 +786,15 @@
                                 seriesToolTipFormat = "{openDateX.formatDate('dd.MM.yyyy')} - {dateX.formatDate('dd.MM.yyyy ')}";
                                 formattedDateTime = 'dd.MM.yyyy'; //formatStartDatetime
                                 valDateXFormatted = 'dd.MM.yyyy'; //formatEndDatetime
-                                //(i < 1) ? window.alert('NewDate: ' + new Date(yyyy, mm - 1, dd)): 0;
                             } else if (fragOfTime.length === 6) {
                                 conv2Date = new Date(yyyy, mm - 1, dd, fragOfTime[3], fragOfTime[4], fragOfTime[5]);
                                 seriesToolTipFormat = "{openDateX.formatDate('dd.MM.yyyy HH:mm')} - {dateX.formatDate('HH:mm')}";
                                 formattedDateTime = 'dd.MM.yyyy HH:mm';
                                 valDateXFormatted = 'HH:mm';
-                                //(i < 1) ? window.alert('NewDateTime: ' + new Date(yyyy, mm - 1, dd, fragOfTime[3], fragOfTime[4], fragOfTime[5])): 0;
                             }
-                            //(i < 1) ? window.alert('conv2date after: ' + conv2Date): 0;
                             return conv2Date;
                         }
 
-                        /* if (startAttrIsDate === "datetime") {
-                            var fragOfTime = c.startdate.split(/[\s,-/\\:]+/), // split by multiple chars ( \s = whitespace | ,-/ = Range from , to / char code 44 to char code 47 | \\ = \ | : = : | []+ = 1 or more)
-                                yyyy, mm, dd;
-                             //window.alert('fragoftume: ' + fragOfTime);
-
-                            switch (me.getProperty("dateTimeFormat")) {
-                                case "dd-mm-yyyy":
-                                    yyyy = fragOfTime[2];
-                                    mm = fragOfTime[1];
-                                    dd = fragOfTime[0];
-                                    break;
-                                case "mm-dd-yyyy":
-                                    yyyy = fragOfTime[2];
-                                    mm = fragOfTime[0];
-                                    dd = fragOfTime[1];
-                                    break;
-                                case "yyyy-dd-mm":
-                                    yyyy = fragOfTime[0];
-                                    mm = fragOfTime[2];
-                                    dd = fragOfTime[1];
-                                    break;
-                                case "yyyy-mm-dd":
-                                    yyyy = fragOfTime[0];
-                                    mm = fragOfTime[1];
-                                    dd = fragOfTime[2];
-                                    break;
-                            };
-
-                            if (fragOfTime[2].length == 2) {
-                                fragOfTime[2] = '20' + fragOfTime[2];
-                            }
-                            (i < 1) ? window.alert('y: ' + yyyy + ' _m: ' + mm + ' _d: ' + dd + '\nh: ' + fragOfTime[3] + ' : min: ' + fragOfTime[4]): 0;
-                            
-
-                            //check if date (d,m,y) or datetime(d,m,y,h,m,s)
-                            if (fragOfTime.length === 3) {
-                                // Note: JavaScript counts months from 0 to 11. January is 0.
-                                // convert to Datetime-Format yyyy-mm-ddTHH:mm:ss.000Z
-                                c.startdate = new Date(yyyy, mm - 1, dd);
-                                seriesToolTipFormat = "{dateX.formatDate('dd.MM.yyyy ')}: {name}: [bold]{valueY}[/]";
-                                (i < 1) ? window.alert('NewDate: ' + new Date(yyyy, mm - 1, dd)): 0;
-                            } else if (fragOfTime.length === 6) {
-                                c.startdate = new Date(yyyy, mm - 1, dd, fragOfTime[3], fragOfTime[4], fragOfTime[5]);
-                                seriesToolTipFormat = "{dateX.formatDate('dd.MM.yyyy HH:mm')}: {name}: [bold]{valueY}[/]";
-                                (i < 1) ? window.alert('NewDateTime: ' + new Date(yyyy, mm - 1, dd, fragOfTime[3], fragOfTime[4], fragOfTime[5])): 0;
-                            }
-                        } */
                         /// NEW Approach
 
 
