@@ -91,7 +91,8 @@
                     weekendFillColor: {fillColor: "#000000", fillAlpha: "20"},
                     metricFormat: "#,###.00",
                     showDebugMsgs: 'false',
-                    dateTimeFormat: "dd-mm-yyyy"
+                    dateTimeFormat: "dd-mm-yyyy",
+                    heatmapMetric: 0
                 });
 
                 am4core.useTheme(am4themes_animated);
@@ -203,6 +204,7 @@
                 var series1 = chart2.series.push(new am4charts.ColumnSeries());
                 var numOfMetrics = datapool.cols.length;
                 var metrics4tooltip = "";
+                var hmapMetric = me.getProperty("heatmapMetric")
                 series1.columns.template.height = am4core.percent(70);
 
                 series1.dataFields.openDateX = datapool.attrs[0]; // startdatetime, named startdate in perparedata(), then renamend to first Attributename
@@ -211,14 +213,14 @@
                 series1.dataFields.task = datapool.attrs[3];
                 series1.dataFields.imgName = datapool.attrs[4];
                 series1.dataFields.valueY = datapool.cols[0];
+                series1.dataFields.valueX = datapool.cols[hmapMetric];
+
                 //series1.dataFields.nameY = datapool.cols[0];
                 // TOOLTIP: assign metrics and build tooltip (series1.dataFields.valueY[i] = "values0";)
-                // !! series1.dataFields.valueY0 is not a valid property recognized by the amcharts-api --> eg means it cant be used for heatrules.
                 for (let value of datapool.cols){};
                 for (var i = 0; i < numOfMetrics; i++) {
                     var myVar = "valueY" + i; // Metric Value
                     series1.dataFields[myVar] = datapool.cols[i]; // Metric Value
-
                     let push = "\n" + datapool.cols[i] + ": {" + myVar + "}";
                     metrics4tooltip += push;
                 };
@@ -232,12 +234,14 @@
                 // NOTE Thresholds, Heatrules - color series.columns depending on value of first metric from min to max
                 if (me.getProperty("showThreshold") === 'true') {
                     /* TODO
-                    /**Heatmap basierend auf einzelwerten wie zb ALert red und alert orange. jeder wert ValueY hat zwei individuell e wert red und orange gegen die verglichen werden soll.
-                     * https: //codepen.io/team/amcharts/pen/pLOXgO?editors=0010
-                     * https: //www.amcharts.com/docs/v4/reference/iheatrule/
-                     * https: //www.amcharts.com/docs/v4/concepts/series/#Heat_maps
+                    /**Heatmap basierend auf einzelwerten wie zb ALert red und alert orange. jeder wert ValueY hat zwei individuelle werte red und orange gegen die verglichen werden soll.
+                     * https://codepen.io/team/amcharts/pen/pLOXgO?editors=0010
+                     * https://www.amcharts.com/docs/v4/reference/iheatrule/
+                     * https://www.amcharts.com/docs/v4/concepts/series/#Heat_maps
+                     * https://www.amcharts.com/docs/v5/concepts/settings/heat-rules/
                      * Problem: minValue erwartet einen einzelnen wert der für all valueY gilt.
                      * Lösung:
+                     * https://www.amcharts.com/docs/v4/tutorials/multi-color-xy-heatmap/
                      * Alternative: minmax werte manuell festlegen und ValueY immer so definieren, dass im valueY bereits der vergleich zur Zielgröße enthalten ist
                      *      Beispiel: ValueY = 25; red = 50; orange = 20
                      *                  IF ValueY<orange then 0 else ValueY>orange AND ValueY<red then 1 else ValueY>red then 2
@@ -258,14 +262,14 @@
                             "property": "fill",
                             "min": am4core.color(me.getProperty("minThresholdColor").fillColor),
                             "max": am4core.color(me.getProperty("maxThresholdColor").fillColor),
-                            "dataField": "valueY"
+                            "dataField": "valueX"
                         });
                         series1.heatRules.push({
                             "target": series1.columns.template,
                             "property": "stroke",
                             "min": am4core.color(me.getProperty("minThresholdColor").fillColor).lighten(-0.5),
                             "max": am4core.color(me.getProperty("maxThresholdColor").fillColor).lighten(-0.5),
-                            "dataField": "valueY"
+                            "dataField": "valueX"
                         });
                     } else {
                         //it's a number
@@ -278,7 +282,7 @@
                             "max": am4core.color(me.getProperty("maxThresholdColor").fillColor),
                             "minValue": floatMinValue,
                             "maxValue": floatMaxValue,
-                            "dataField": "valueY"
+                            "dataField": "valueX"
                         });
                         series1.heatRules.push({
                             "target": series1.columns.template,
@@ -287,13 +291,15 @@
                             "max": am4core.color(me.getProperty("maxThresholdColor").fillColor).lighten(-0.5),
                             "minValue": floatMinValue,
                             "maxValue": floatMaxValue,
-                            "dataField": "valueY"
+                            "dataField": "valueX"
                         });
                     }
                     
                     
                 } else {
                     // as by default columns of the same series are of the same color, we add adapter which takes colors from chart.colors color set
+                    // TODO set so that same tasks get the same color
+                    // clickable Tasks: "column.dataItem.task == event.target.dataItem.task"
                     series1.columns.template.adapter.add("fill", function (fill, target) {
                         return chart2.colors.getIndex(target.dataItem.index);
                     });
@@ -301,6 +307,26 @@
                         return chart2.colors.getIndex(target.dataItem.index);
                     });
                 }
+
+                // Conditional fills
+                // FIXME 
+                series1.columns.template.column.adapter.add("fill", function (fill, target) {
+                    var myVar = "valueY" + hmapMetric; // Metric Value
+                    //series1.dataFields[myVar] = datapool.cols[hmapMetric];
+                    window.alert(target.dataItem.valueX + " .::. " + target.dataItem.valueY0 + " hmapMetric: " + datapool.cols[hmapMetric] 
+                                    +"\n myVar(hmap): " + target.dataItem[myVar]);
+                    if (target.dataItem) {
+                        if (target.dataItem.value >= 600) {
+                            
+                            return am4core.color("#0f0")
+                        } else if (target.dataItem.value >= 400) {
+                            return am4core.color("#ff0")
+                        } else {
+                            return am4core.color("#f00");
+                        }
+                    }
+                    return fill;
+                });
 
                 //NOTE Scrollbar ---------------------------------//
                 chart2.cursor = new am4charts.XYCursor();
@@ -418,6 +444,7 @@
                         info.background.fillOpacity = me.getProperty("InfoboxFillColor").fillAlpha * 0.01;
                         info.background.stroke = am4core.color(me.getProperty("InfoboxStrokeColor").fillColor);
                         info.background.strokeOpacity = me.getProperty("InfoboxStrokeColor").fillAlpha * 0.01;
+
                         title.truncate = false;
                         title.wrap = true;
                         title.width = am4core.percent(100);
@@ -430,6 +457,7 @@
                         infoLabelCont.width = me.getProperty("infoboxWidth") - 20;
                         infoLabelCont.fontSize = me.getProperty("infoboxFontSize")
                         infoLabelCont.layout = "grid";
+
                         var minTextWidth = me.getProperty("infoboxWidth") * 0.4; // Text width is 45% of the entire InfoBox width
                         var txtOpenDateX = infoLabelCont.createChild(am4core.Label); // Date Start Text
                         var valOpenDateX = infoLabelCont.createChild(am4core.Label); // Date Start Value
@@ -500,6 +528,8 @@
                             img.filters.push(new am4core.DropShadowFilter());
                             img.margin(0, 0, 0, 0);
                             img.padding(12, 0, 0, 0);
+
+                            
                         }
                     } else {
                         // InfoLine below
@@ -540,7 +570,6 @@
                             if (me.getProperty("displayImage") == "true" && (datapool.attrs[4])) {
                                 var imgName = ev.target.dataItem.imgName;
                                 img.href = imgPrefix + imgName + imgSuffix;
-                                // TODO poster als infobox.background info.background = 
                             }
                         } else {
                             // Update labels in vertical
@@ -736,9 +765,6 @@
                         c.startdate = dp.getRowHeaders(i).getHeader(0).getName();
                         c.enddate = dp.getRowHeaders(i).getHeader(1).getName();
 
-
-
-                        /// NEW Approach
                         c.startdate = createDateTime(c.startdate);
                         c.enddate = createDateTime(c.enddate);
 
@@ -795,98 +821,6 @@
                             return conv2Date;
                         }
 
-                        /// NEW Approach
-
-
-
-
-
-/*
-                        switch (startAttrIsDate) {
-                            case "date":
-                                if (c.startdate.indexOf('.') > -1) {
-                                    var parts = c.startdate.split('.');
-                                    if (parts[2].length == 2) {
-                                        parts[2] = '20' + parts[2];
-                                    }
-                                    // convert to Datetime-Format yyyy-mm-ddTHH:mm:ss.000Z
-                                    c.startdate = new Date(parts[2], parts[1] - 1, parts[0]);
-                                } else if (c.startdate.indexOf('/') > -1) {
-                                    var parts = c.startdate.split('/');
-                                    if (parts[2].length == 2) {
-                                        parts[2] = '20' + parts[2];
-                                    }
-                                    // Note: JavaScript counts months from 0 to 11. January is 0. December is 11.
-                                    // convert to Datetime-Format yyyy-mm-ddTHH:mm:ss.000Z
-                                    c.startdate = new Date(parts[2], parts[0] - 1, parts[1]);
-                                }
-                                seriesToolTipFormat = "{dateX.formatDate('dd.MM.yyyy ')}: {name}: [bold]{valueY}[/]";
-                                break;
-
-                            case "datetime":
-                                var parts = c.startdate.split(' ');
-                                //var dparts = parts[0].split('.');
-                                var dparts = parts[0].split(/\.|\//); //split by dot(.) or forwardslash(/)
-                                var tparts = parts[1].split(':');
-                                //c.startdate = new Date('20' + dparts[2], dparts[1] - 1, dparts[0], tparts[0], tparts[1], tparts[2]);
-                                c.startdate = new Date(dparts[2], dparts[1] - 1, dparts[0], tparts[0], tparts[1], tparts[2]);
-                                seriesToolTipFormat = "{dateX.formatDate('dd.MM.yyyy HH:mm')}: {name}: [bold]{valueY}[/]";
-                                break;
-                            case "datetime_us":
-                                var parts = c.startdate.split(' ');
-                                //var dparts = parts[0].split('.');
-                                var dparts = parts[0].split(/\.|\//); //split by dot(.) or forwardslash(/)
-                                var tparts = parts[1].split(':');
-                                //c.startdate = new Date('20' + dparts[2], dparts[1] - 1, dparts[0], tparts[0], tparts[1], tparts[2]);
-                                c.startdate = new Date(dparts[2], dparts[1] - 1, dparts[0], tparts[0], tparts[1], tparts[2]);
-                                seriesToolTipFormat = "{dateX.formatDate('dd.MM.yyyy HH:mm')}: {name}: [bold]{valueY}[/]";
-                                break;
-                            default:
-                                if (i < 2) {
-                                    window.alert('default (' + i + '): Doesn´t look like a date to me. \nstartdate = ' + c.startdate + '\nExpected Date-Format: [dd.MM.yy(yy)].\nExpected DateTime-Format: [dd.MM.yy(yy) HH:mm:ss]');
-                                }
-                                //i = dp.getTotalRows();
-                                break;
-                        };
-
-                        switch (endAttrIsDate) {
-                            case "date":
-                                if (c.enddate.indexOf('.') > -1) {
-                                    var parts = c.enddate.split('.');
-                                    if (parts[2].length == 2) {
-                                        parts[2] = '20' + parts[2];
-                                    }
-                                    // convert to Datetime-Format yyyy-mm-ddTHH:mm:ss.000Z
-                                    c.enddate = new Date(parts[2], parts[1] - 1, parts[0]);
-                                } else if (c.enddate.indexOf('/') > -1) {
-                                    var parts = c.enddate.split('/');
-                                    if (parts[2].length == 2) {
-                                        parts[2] = '20' + parts[2];
-                                    }
-                                    // Note: JavaScript counts months from 0 to 11. January is 0. December is 11.
-                                    // convert to Datetime-Format yyyy-mm-ddTHH:mm:ss.000Z
-                                    c.enddate = new Date(parts[2], parts[0] - 1, parts[1]);
-                                }
-                                seriesToolTipFormat = "{dateX.formatDate('dd.MM.yyyy ')}: {name}: [bold]{valueY}[/]";
-                                break;
-
-                            case "datetime":
-                                var parts = c.enddate.split(' ');
-                                //var dparts = parts[0].split('.');
-                                var dparts = parts[0].split(/\.|\//); //split by dot(.) or forwardslash(/)
-                                var tparts = parts[1].split(':');
-                                //c.enddate = new Date('20' + dparts[2], dparts[1] - 1, dparts[0], tparts[0], tparts[1], tparts[2]);
-                                c.enddate = new Date(dparts[2], dparts[1] - 1, dparts[0], tparts[0], tparts[1], tparts[2]);
-                                seriesToolTipFormat = "[bold]{dateX.formatDate('dd.MM.yyyy HH:mm')}: {name}: {valueY}[/]";
-                                break;
-                            default:
-                                if (i < 2) {
-                                    window.alert('default (' + i + '): Doesn´t look like a date to me. \nenddate = ' + c.enddate + '\nExpected Date-Format: [dd.MM.yy(yy)].\nExpected DateTime-Format: [dd.MM.yy(yy) HH:mm:ss]');
-                                }
-                                //i = dp.getTotalRows();
-                                break;
-                        };
-*/
                         // Rename the columnheader for startdatetime and enddatetime (eg: c.startdate --> actual attribute name)
                         c[dp.getRowTitles(0).getTitle(0).getName()] = c.startdate;
                         c[dp.getRowTitles(0).getTitle(1).getName()] = c.enddate;
@@ -958,6 +892,7 @@
                     var Say1 = 'DataPool: \n datapool.cols: ' + JSON.stringify(datapool.cols) + '\n datapool.attrs: ' + JSON.stringify(datapool.attrs);
                     var Say2 = "datapool.rows:";
                     var myWindow2 = (me.getProperty("showDebugMsgs") == 'true') ? PopUp(Say1, Say2, datapool.rows) : 0;
+                    var myWindow3 = (me.getProperty("showDebugTbl") == 'true') ? PopUp(Say1, Say2, datapool.rows) : 0;
 
                     return datapool;
                  };

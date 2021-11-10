@@ -22,7 +22,7 @@
             getCustomProperty: function getCustomProperty() {
                 var myViz = this.getHost();
 
-                var numOfMetrics = myViz.zonesModel.getDropZones().zones[2].items.length;
+                var numOfMetrics = myViz.zonesModel.getDropZones().zones[4].items.length;
                 var allowHtmlFlag;
                 var totalsFlag, lineFlag;
                 // Fill the property data here
@@ -32,6 +32,65 @@
                     {
                         name: 'amCharts Gantt Options',
                         value: [
+                            // Options Group
+                            {
+                                style: $WT.EDITORGROUP,
+                                items: [{
+                                    style: $WT.LABEL,
+                                    labelText: "Options"
+                                }, {
+                                    style: $WT.CHECKBOXANDLABEL,
+                                    propertyName: "displayXYChartScrollbar",
+                                    labelText: "Show XYChartScrollbar"
+                                }, {
+                                    style: $WT.TWOCOLUMN,
+                                    items: [{
+                                        style: $WT.LABEL,
+                                        disabled: this.getHost().getProperty('displayXYCursor') === "false",
+                                        width: "40%",
+                                        labelText: "Wheel Scroll"
+                                    }, {
+                                        style: $WT.PULLDOWN,
+                                        disabled: this.getHost().getProperty('displayXYCursor') === "false",
+                                        width: "60%",
+                                        propertyName: "behaviorWheelScroll",
+                                        items: [{
+                                            name: "none",
+                                            value: "none"
+                                        }, {
+                                            name: "zoom",
+                                            value: "zoomX"
+                                        }, {
+                                            name: "pan",
+                                            value: "panX"
+                                        }]
+                                    }]
+                                }, {
+                                    style: $WT.TWOCOLUMN,
+                                    items: [{
+                                        style: $WT.LABEL,
+                                        width: "40%",
+                                        labelText: "DateTime Format (Separator doesnt matter)"
+                                    }, {
+                                        style: $WT.PULLDOWN,
+                                        width: "60%",
+                                        propertyName: "dateTimeFormat",
+                                        items: [{
+                                            name: "dd-mm-yyyy",
+                                            value: "dd-mm-yyyy"
+                                        }, {
+                                            name: "mm-dd-yyyy",
+                                            value: "mm-dd-yyyy"
+                                        }, {
+                                            name: "yyyy-dd-mm",
+                                            value: "yyyy-dd-mm"
+                                        }, {
+                                            name: "yyyy-mm-dd",
+                                            value: "yyyy-mm-dd"
+                                        }]
+                                    }]
+                                }]
+                            },
                             {
                                 style: $WT.EDITORGROUP,
                                 items: [
@@ -183,67 +242,6 @@
                                                 width: "50%"
                                             }
                                         ]
-                                    }
-                                ]
-                            },
-                            // Options Group
-                            {
-                                style: $WT.EDITORGROUP,
-                                items: [
-                                    {
-                                        style: $WT.LABEL,
-                                        labelText: "Options"
-                                    }, {
-                                        style: $WT.CHECKBOXANDLABEL,
-                                        propertyName: "displayXYChartScrollbar",
-                                        labelText: "Show XYChartScrollbar"
-                                    }, {
-                                        style: $WT.TWOCOLUMN,
-                                        items: [{
-                                            style: $WT.LABEL,
-                                            disabled: this.getHost().getProperty('displayXYCursor') === "false",
-                                            width: "40%",
-                                            labelText: "Wheel Scroll"
-                                        }, {
-                                            style: $WT.PULLDOWN,
-                                            disabled: this.getHost().getProperty('displayXYCursor') === "false",
-                                            width: "60%",
-                                            propertyName: "behaviorWheelScroll",
-                                            items: [{
-                                                name: "none",
-                                                value: "none"
-                                            }, {
-                                                name: "zoom",
-                                                value: "zoomX"
-                                            }, {
-                                                name: "pan",
-                                                value: "panX"
-                                            }]
-                                        }]
-                                    }, {
-                                        style: $WT.TWOCOLUMN,
-                                        items: [{
-                                            style: $WT.LABEL,
-                                            width: "40%",
-                                            labelText: "DateTime Format (Separator doesnt matter)"
-                                        }, {
-                                            style: $WT.PULLDOWN,
-                                            width: "60%",
-                                            propertyName: "dateTimeFormat",
-                                            items: [{
-                                                name: "dd-mm-yyyy",
-                                                value: "dd-mm-yyyy"
-                                            }, {
-                                                name: "mm-dd-yyyy",
-                                                value: "mm-dd-yyyy"
-                                            }, {
-                                                name: "yyyy-dd-mm",
-                                                value: "yyyy-dd-mm"
-                                            }, {
-                                                name: "yyyy-mm-dd",
-                                                value: "yyyy-mm-dd"
-                                            }]
-                                        }]
                                     }
                                 ]
                             },
@@ -410,26 +408,32 @@
                                                     propertyName: "maxThresholdColor",
                                                 }
                                             ]
-                                        }, {
-                                            style: $WT.LABEL,
-                                            width: "30%",
-                                            labelText: "Position262"
-                                        }, {
-                                            style: $WT.PULLDOWN,
-                                            width: "70%",
-                                            propertyName: "threshold12345",
-                                            items: [{
-                                                    name: "vertical1",
-                                                    value: "vertical1"
+                                        }, 
+                                        //Select Metric for Heatmap
+                                        {
+                                            style: $WT.EDITORGROUP,
+                                            items: (function () {
+                                                var y = [];
+                                                var x = [{
+                                                    style: $WT.LABEL,
+                                                    labelText: "Metric for Heatmap"
                                                 }, {
-                                                    name: "horizontal1",
-                                                    value: "horizontal1"
+                                                    style: $WT.PULLDOWN,
+                                                    width: "100%",
+                                                    propertyName: "heatmapMetric",
+                                                    items: y
+                                                }];
+                                                for (var i = 0; i < numOfMetrics; i++) {
+                                                    y.push({
+                                                        name: myViz.zonesModel.getDropZones().zones[4].items[i].n,
+                                                        value: i
+                                                    });
                                                 }
-                                            ]
+                                                return x;
+                                            })()
                                         }, {
                                             //minThresholdValue
                                             style: $WT.TWOCOLUMN,
-                                            disabled: this.getHost().getProperty('clickTask') === "false",
                                             items: [{
                                                     style: $WT.LABEL,
                                                     width: "30%",
@@ -443,7 +447,6 @@
                                         }, {
                                             //maxThresholdValue
                                             style: $WT.TWOCOLUMN,
-                                            disabled: this.getHost().getProperty('clickTask') === "false",
                                             items: [{
                                                     style: $WT.LABEL,
                                                     width: "30%",
@@ -556,11 +559,13 @@
                                             disabled: this.getHost().getProperty('clickTask') === "false",
                                             items: [{
                                                     style: $WT.LABEL,
+                                                    disabled: this.getHost().getProperty('clickTask') === "false",
                                                     width: "30%",
                                                     labelText: "fill color on click"
                                                 },
                                                 {
                                                     style: $WT.FILLGROUP,
+                                                    disabled: this.getHost().getProperty('clickTask') === "false",
                                                     width: "70%",
                                                     propertyName: "clickColorFill",
                                                 }
@@ -604,11 +609,15 @@
                         name: 'Help and Notes',
                         value: [{
                                 style: $WT.LABEL,
-                                labelText: "Version 1.297    (GitHub:RobjSky)"
+                                labelText: "Version 1.45    (GitHub:RobjSky)"
                             }, {
                                 style: $WT.CHECKBOXANDLABEL,
                                 propertyName: "showDebugMsgs",
                                 labelText: "Show Msg"
+                            }, {
+                                style: $WT.CHECKBOXANDLABEL,
+                                propertyName: "showDebugTbl",
+                                labelText: "Show Debug Table"
                             }, {
                                 style: $WT.LABEL,
                                 labelText: "Help: Date Start and End Function! This function assumes first and second input to be of the date- or datetime-format! Date needs to be in the form of dd.mm.yy(yy) DateTime needs to be in the form of dd.mm.yy(yy) hh:mm:ss"
