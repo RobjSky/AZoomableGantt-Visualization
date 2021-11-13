@@ -56,6 +56,7 @@
                 // ! Visualisation as Selector
                 this.addUseAsFilterMenuItem();
 
+
                 this.setDefaultPropertyValues({
                     showInfobox: 'true',
                     showThreshold: 'false',
@@ -84,6 +85,9 @@
                     //hideYAxisLabels: 'false',
                     minThresholdColor: {fillColor: "#0c8320", fillAlpha: "100"},
                     maxThresholdColor: {fillColor: "#830c0c", fillAlpha: "100"},
+                    threshold0Color: {fillColor: "#D61515", fillAlpha: "100"},
+                    threshold1Color: {fillColor: "#FF7F0E", fillAlpha: "100"},
+                    threshold2Color: {fillColor: "#1BA11B", fillAlpha: "100"},
                     amountStrokeXColor: {fillColor: "#A3A3A3", fillAlpha: "50"},
                     amountStrokeYColor: {fillColor: "#A3A3A3", fillAlpha: "50"},
                     axisXColor: {fillColor: "#ebebeb", fillAlpha: "100"},
@@ -163,7 +167,7 @@
                     //dateAxis.renderer.minGridDistance = me.getProperty("minGridDist");
                     dateAxis.renderer.tooltipLocation = 0;
                     //dateAxis.groupData = 'false';
-                    // Format dateAxis
+                    // Format dateAxis - https://www.amcharts.com/docs/v4/concepts/axes/date-axis/#Formatting_date_and_time
                     dateAxis.renderer.grid.template.stroke = am4core.color(me.getProperty("amountStrokeXColor").fillColor);
                     dateAxis.renderer.grid.template.strokeOpacity = me.getProperty("amountStrokeXColor").fillAlpha * 0.01;
                     dateAxis.renderer.labels.template.fill = am4core.color(me.getProperty("fontColor").fillColor);
@@ -224,82 +228,145 @@
                     let push = "\n" + datapool.cols[i] + ": {" + myVar + "}";
                     metrics4tooltip += push;
                 };
-                //FIXME
                 if (me.getProperty("showToolTip") === 'true') {
                     series1.columns.template.tooltipText = "{categoryY}\n[bold]{task}[/]: \n" + seriesToolTipFormat + metrics4tooltip;
                 }
 
 
 
-                // NOTE Thresholds, Heatrules - color series.columns depending on value of first metric from min to max
+                // NOTE Thresholds, Heatrules - color series.columns depending on valueX = hmapMetric = selected metric for Threshold or heatrules
+                /** Threshold and Heatrules have in total 3 options:
+                 * 1. Heatrules are applied according to min and max of selected metric
+                 * 2. Heatrules are applied according to input values for min and max of selected metric
+                 * 3. Threshold is applied to selected metric according to 2 selected threshold metrics in the form of (color1 <= Metric1 < color2 <= Metric2 < color3)
+                 * While one and two are options for comparing tasks against each other option three allows for measuring tasks against individual thresholds.
+                 * Option 1 is applied if no input values for min or max are set. If both are set, then Option 2 is applied to the Viz.
+                 * https://www.amcharts.com/docs/v4/reference/iheatrule/
+                 * https://www.amcharts.com/docs/v4/concepts/series/#Heat_maps
+                 * https://www.amcharts.com/docs/v5/concepts/settings/heat-rules/
+                 */
+
                 if (me.getProperty("showThreshold") === 'true') {
-                    /* TODO
-                    /**Heatmap basierend auf einzelwerten wie zb ALert red und alert orange. jeder wert ValueY hat zwei individuelle werte red und orange gegen die verglichen werden soll.
-                     * https://codepen.io/team/amcharts/pen/pLOXgO?editors=0010
-                     * https://www.amcharts.com/docs/v4/reference/iheatrule/
-                     * https://www.amcharts.com/docs/v4/concepts/series/#Heat_maps
-                     * https://www.amcharts.com/docs/v5/concepts/settings/heat-rules/
-                     * Problem: minValue erwartet einen einzelnen wert der für all valueY gilt.
-                     * Lösung:
-                     * https://www.amcharts.com/docs/v4/tutorials/multi-color-xy-heatmap/
-                     * Alternative: minmax werte manuell festlegen und ValueY immer so definieren, dass im valueY bereits der vergleich zur Zielgröße enthalten ist
-                     *      Beispiel: ValueY = 25; red = 50; orange = 20
-                     *                  IF ValueY<orange then 0 else ValueY>orange AND ValueY<red then 1 else ValueY>red then 2
-                     *                  min wäre dann 1 und max wäre 2
-                    */
-                    //window.alert('series1.valueY2: ' + JSON.stringify(series1.dataFields.valueY2) + '. minthresholdvalue: ' + me.getProperty("minThresholdValue"));
                     // depending on wether or not values for min and max threshold are set those values will be used or ignored
                     // parse string from input to float
-                    let floatMinValue = parseFloat(me.getProperty("minThresholdValue"));
-                    let floatMaxValue = parseFloat(me.getProperty("maxThresholdValue"));
-                    // if min or max is no number igonre the minThresholdValue and maxThresholdValue (isNaN = Not a Number)
-                    if (isNaN(floatMinValue) || isNaN(floatMaxValue)) {
-                        //it's Not a Number
-                        //window.alert('//its a nööö! ' + floatMinValue + '! Max: ' + floatMaxValue);
 
-                        series1.heatRules.push({
-                            "target": series1.columns.template,
-                            "property": "fill",
-                            "min": am4core.color(me.getProperty("minThresholdColor").fillColor),
-                            "max": am4core.color(me.getProperty("maxThresholdColor").fillColor),
-                            "dataField": "valueX"
-                        });
-                        series1.heatRules.push({
-                            "target": series1.columns.template,
-                            "property": "stroke",
-                            "min": am4core.color(me.getProperty("minThresholdColor").fillColor).lighten(-0.5),
-                            "max": am4core.color(me.getProperty("maxThresholdColor").fillColor).lighten(-0.5),
-                            "dataField": "valueX"
-                        });
+                    var typeOfThreshold;
+                    if (this.getHost().getProperty('threshold') == undefined) {
+                        typeOfThreshold = "{'heatrule':'true','threshold':'false'}"
                     } else {
-                        //it's a number
-                        //window.alert('//its a number! ' + floatMinValue + '! Max: ' + floatMaxValue);
-
-                        series1.heatRules.push({
-                            "target": series1.columns.template,
-                            "property": "fill",
-                            "min": am4core.color(me.getProperty("minThresholdColor").fillColor),
-                            "max": am4core.color(me.getProperty("maxThresholdColor").fillColor),
-                            "minValue": floatMinValue,
-                            "maxValue": floatMaxValue,
-                            "dataField": "valueX"
-                        });
-                        series1.heatRules.push({
-                            "target": series1.columns.template,
-                            "property": "stroke",
-                            "min": am4core.color(me.getProperty("minThresholdColor").fillColor).lighten(-0.5),
-                            "max": am4core.color(me.getProperty("maxThresholdColor").fillColor).lighten(-0.5),
-                            "minValue": floatMinValue,
-                            "maxValue": floatMaxValue,
-                            "dataField": "valueX"
-                        });
+                        typeOfThreshold = this.getHost().getProperty('threshold');
                     }
-                    
-                    
+                    // NOTE Threshold: heatrule = get min max from selected Metric
+                    if (typeOfThreshold.heatrule === 'true') {
+                        let floatMinValue = parseFloat(me.getProperty("minThresholdValue"));
+                        let floatMaxValue = parseFloat(me.getProperty("maxThresholdValue"));
+                        // if min or max is no number ignore the minThresholdValue and maxThresholdValue (isNaN = Not a Number)
+                        if (isNaN(floatMinValue) || isNaN(floatMaxValue)) {
+                            //it's Not a Number
+                            series1.heatRules.push({
+                                "target": series1.columns.template,
+                                "property": "fill",
+                                "min": am4core.color(me.getProperty("minThresholdColor").fillColor),
+                                "max": am4core.color(me.getProperty("maxThresholdColor").fillColor),
+                                "dataField": "valueX"
+                            });
+                            series1.heatRules.push({
+                                "target": series1.columns.template,
+                                "property": "stroke",
+                                "min": am4core.color(me.getProperty("minThresholdColor").fillColor).lighten(-0.5),
+                                "max": am4core.color(me.getProperty("maxThresholdColor").fillColor).lighten(-0.5),
+                                "dataField": "valueX"
+                            });
+                        } else {
+                            //it's a number --> Threshold: heatrule = get min max from input values
+                            series1.heatRules.push({
+                                "target": series1.columns.template,
+                                "property": "fill",
+                                "min": am4core.color(me.getProperty("minThresholdColor").fillColor),
+                                "max": am4core.color(me.getProperty("maxThresholdColor").fillColor),
+                                "minValue": floatMinValue,
+                                "maxValue": floatMaxValue,
+                                "dataField": "valueX"
+                            });
+                            series1.heatRules.push({
+                                "target": series1.columns.template,
+                                "property": "stroke",
+                                "min": am4core.color(me.getProperty("minThresholdColor").fillColor).lighten(-0.5),
+                                "max": am4core.color(me.getProperty("maxThresholdColor").fillColor).lighten(-0.5),
+                                "minValue": floatMinValue,
+                                "maxValue": floatMaxValue,
+                                "dataField": "valueX"
+                            });
+                        }                        
+                    };
+                    // NOTE Threshold: threshold = get individual values from two selected Metrics to have three colors (color1 < Metric1 < color2 < Metric2 < color3)
+                    if (typeOfThreshold.threshold === 'true') {
+                        // Threshold - Conditional fills
+                        // FIXME currently problems with decimal places. 117,50 --> 11750
+                             let m1 = this.getHost().getProperty('threshold1');
+                             let m2 = this.getHost().getProperty('threshold2');
+                        
+                        series1.columns.template.column.adapter.add("fill", function (fill, target) {
+                            //var myVar = "valueY" + hmapMetric; // Metric Value
+                            let threshold1 = "valueY" + m1 // Metric Value
+                            let threshold2 = "valueY" + m2 // Metric Value
+                            // convert to number and remove 3rd+ decimal places, only 1st and 2nd decimal places will be considered.
+                            let targetValue = Math.round(target.dataItem.valueX * 100)
+                            let t1ToNumber = Math.round(parseFloat(target.dataItem[threshold1]) * 100)
+                            let t2ToNumber = Math.round(parseFloat(target.dataItem[threshold2]) * 100)
+
+                            window.alert("targetValX: " + target.dataItem.valueX + " // tg: " + targetValue +
+                                    "\nthreshold1: " + target.dataItem[threshold1] + " // t1: " + t1ToNumber +
+                                    "\nthreshold2: " + target.dataItem[threshold2] + " // t2: " + t2ToNumber);
+
+                            if (target.dataItem) {
+                                if (targetValue >= t2ToNumber) {
+                                //if (target.dataItem.valueX >= target.dataItem[threshold2]) {
+                                    return am4core.color(me.getProperty("threshold2Color").fillColor);
+                                } else if (targetValue >= t1ToNumber) {
+                                //} else if (target.dataItem.valueX >= target.dataItem[threshold1]) {
+                                    return am4core.color(me.getProperty("threshold1Color").fillColor);
+                                } else {
+                                    return am4core.color(me.getProperty("threshold0Color").fillColor);
+                                }
+                            }
+                            return fill;
+                        });
+                    };
+
+                } else if (me.getProperty("colorByTask") === 'true') {
+                    /** colorByTask: gets the values from fourth attribute (datapool.attrs[3]) and creates a unique list from those (distTasks).
+                     *  Based on that list colors are assigned to the tasks. Tasks with same name will get same color.
+                     *  Access values for Attribute "movie"
+                     *  window.alert('datapool.rows[1].Movie: ' + JSON.stringify(datapool.rows[1].Movie));
+                     *  colors.getIndex(0) = color code from index 0
+                     *  distTasks.indexOf('test') = check if test is in array distTasks and return index
+                     *  target.dataItem.task = value of current or target task
+                     */
+                    // create distinct list of tasks
+                    let lookup = {};
+                    let items = chart2.data;
+                    let taskname = datapool.attrs[3]
+                    let distTasks = [];
+                    // get each task value from source(items)
+                    for (let item, i = 0; item = items[i++];) {
+                        let taskvalue = item[taskname];
+                        // check if task name already in lookup{} if not push into lookup{}
+                        if (!(taskvalue in lookup)) {
+                            lookup[taskvalue] = 1;
+                            distTasks.push(taskvalue);
+                        }
+                    }
+
+                    series1.columns.template.adapter.add('fill', function (fill, target) {
+                        return chart2.colors.getIndex(distTasks.indexOf(target.dataItem.task));
+                    });
+                    series1.columns.template.adapter.add('stroke', function (fill, target) {
+                        return chart2.colors.getIndex(distTasks.indexOf(target.dataItem.task));
+                    });
+
                 } else {
                     // as by default columns of the same series are of the same color, we add adapter which takes colors from chart.colors color set
-                    // TODO set so that same tasks get the same color
-                    // clickable Tasks: "column.dataItem.task == event.target.dataItem.task"
                     series1.columns.template.adapter.add("fill", function (fill, target) {
                         return chart2.colors.getIndex(target.dataItem.index);
                     });
@@ -308,37 +375,14 @@
                     });
                 }
 
-                // Conditional fills
-                // FIXME 
-                series1.columns.template.column.adapter.add("fill", function (fill, target) {
-                    var myVar = "valueY" + hmapMetric; // Metric Value
-                    //series1.dataFields[myVar] = datapool.cols[hmapMetric];
-                    window.alert(target.dataItem.valueX + " .::. " + target.dataItem.valueY0 + " hmapMetric: " + datapool.cols[hmapMetric] 
-                                    +"\n myVar(hmap): " + target.dataItem[myVar]);
-                    if (target.dataItem) {
-                        if (target.dataItem.value >= 600) {
-                            
-                            return am4core.color("#0f0")
-                        } else if (target.dataItem.value >= 400) {
-                            return am4core.color("#ff0")
-                        } else {
-                            return am4core.color("#f00");
-                        }
-                    }
-                    return fill;
-                });
+                
 
                 //NOTE Scrollbar ---------------------------------//
                 chart2.cursor = new am4charts.XYCursor();
-                
                 chart2.zoomOutButton.background.fill = am4core.color(me.getProperty("InfoboxFillColor").fillColor);
-                //chart2.zoomOutButton.background.fill = am4core.color("#c3c3c3");
-                //chart2.zoomOutButton.background.stroke = am4core.color("red");
                 chart2.zoomOutButton.background.stroke = am4core.color(me.getProperty("fontColor").fillColor);
                 chart2.zoomOutButton.background.strokeWidth = 1;
                 chart2.zoomOutButton.background.strokeOpacity = 1;
-
-                //chart2.zoomOutButton.icon.stroke = am4core.color("#f0f0f0");
                 chart2.zoomOutButton.icon.stroke = am4core.color(me.getProperty("fontColor").fillColor);
                 chart2.zoomOutButton.icon.strokeWidth = 2;
                 chart2.zoomOutButton.background.states.getKey("hover").properties.fill = am4core.color("#5A5F73");
