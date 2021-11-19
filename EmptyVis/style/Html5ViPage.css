@@ -1,0 +1,16 @@
+/*
+style definitions for icon on gallery view
+*/
+.mstrmojo-VIGallery .mstrmojo-VIGalleryList .item.ic-EmptyVis > div > div {
+   background: url(images/emptyVis.svg) no-repeat scroll 0 0;
+   background-size: 40px;
+   margin: 5px;
+   display: block;
+}
+.mojo-theme-dark .mstrmojo-VIGallery .mstrmojo-VIGalleryList .item.ic-EmptyVis > div > div {
+   background: url(images/emptyVis.svg) no-repeat scroll 0 0;
+   background-position: 0 0;
+   background-size: 40px;
+   margin: 5px;
+   display: block;
+}

@@ -1,7 +1,7 @@
 (function () {
 
-    if (!mstrmojo.plugins.AZoomableGantt) {
-        mstrmojo.plugins.AZoomableGantt = {};
+    if (!mstrmojo.plugins.EmptyVis) {
+        mstrmojo.plugins.EmptyVis = {};
     }
 
     mstrmojo.requiresCls(
@@ -16,12 +16,12 @@
         ZONE_ANNOTATION3 = 'Task Attribute';
 
 
-    mstrmojo.plugins.AZoomableGantt.AZoomableGanttDropZones = mstrmojo.declare(
+    mstrmojo.plugins.EmptyVis.EmptyVisDropZones = mstrmojo.declare(
         //Declare that this code extends CustomVisDropzones
         mstrmojo.vi.models.CustomVisDropZones,
         null, {
             // Define the JavaScript class that renders your visualization drop zones.
-            scriptClass: 'mstrmojo.plugins.AZoomableGantt.AZoomableGanttDropZones',
+            scriptClass: 'mstrmojo.plugins.EmptyVis.EmptyVisDropZones',
             getCustomDropZones: function getCustomDropZones() {
                 var ENUM_ALLOW_DROP_TYPE = mstrmojo.vi.models.CustomVisDropZones.ENUM_ALLOW_DROP_TYPE;
                 // Fill the zones� definition here.
