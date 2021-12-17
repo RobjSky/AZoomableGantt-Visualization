@@ -53,13 +53,18 @@
                 var domNode = this.domNode,
                      dp = this.dataInterface;
                 var startAttrIsDate = "false";
-                var AttrCount = 0;
+
+                var datatree = this.dataInterface.getRawData(mstrmojo.models.template.DataInterface.ENUM_RAW_DATA_FORMAT.TREE);
+                var datarows_adv = this.dataInterface.getRawData(mstrmojo.models.template.DataInterface.ENUM_RAW_DATA_FORMAT.ROWS_ADV);
+
+                
 
                 // Add data
                 var datapool = prepareData();
 
                 var Say1 = 'DataPool: \n datapool.cols: ' + JSON.stringify(datapool.cols) + '\n datapool.attrs: ' + JSON.stringify(datapool.attrs);
-                var Say2 = "datapool.rows:";
+                var Say2 = "datapool.rows: " + JSON.stringify(datapool.rows);
+                //var Say2 = JSON.stringify(dataraw)
                 var myWindow3 = PopUpInDoss(Say1, Say2, datapool.rows);
 
                 function PopUpInDoss(Say1, Say2, displaydata) {
@@ -79,6 +84,7 @@
                     var p1 = document.createElement("P")
                     p1.style.color = "black";
                     p1.innerText = Say1;
+
                     container.appendChild(p1)
 
                     var p2 = document.createElement("P")
@@ -138,6 +144,92 @@
 
 
 
+               
+
+
+
+
+            // NOTE prepareData() // WITHOUT DATETIME HANLDER AND Break-By
+            // https://www2.microstrategy.com/producthelp/2020/VisSDK/Content/topics/HTML5/DataInterfaceAPI.htm
+            // https://www2.microstrategy.com/producthelp/Current/VisSDK/Content/topics/HTML5/DataInterfaceAPI.htm#DataInterface
+            // https://lw.microstrategy.com/msdz/MSDL/GARelease_Current/_GARelease_Archives/103/docs/projects/VisSDK_All/Default.htm#topics/HTML5/Data_Interface_API.htm
+            function prepareData() {
+                // Date Start and End Function! This function assumes first and second input to be of the date- or datetime-format!!
+                // Create a new array (datapool) and push the objects datarecords to the new array. each datarecord is one single object in the array.
+                // additional a check on "how many attributes?" and "how many metrics are being used?" must be performed to derive the FOR-Indicators
+                // additional a check is needed to format the datetime attribute from MSTR to a datetime attibute in JS.
+                // datapool = {"cols" : [mtr1.Name, mtr2.Name],
+                //             "attrs" : [attr1.Name, attr2.Name],
+                //             "rows" : [{ "attr.Name" : attr.Value1,
+                //                         "mtr1.Name" : mtr1.Value1,
+                //                         "mtr2.Name" : mtr2.Value1 }, {"attr.Name" : attr.Value2, ...}, {...}], 
+                var datapool = {};
+                datapool.attrs = [];
+                // Attributes.Names: set attribute names ["attributename1","attributename2"]
+                for (var z = 0; z < dp.getRowTitles().size(); z++) {
+                    datapool.attrs[z] = dp.getRowTitles(0).getTitle(z).getName();
+                }
+
+                datapool.cols = [];
+                // Metric.Names: set metric column names ["metricname1","metricname2"]
+                for (var z = 0; z < dp.getColumnHeaderCount(); z++) {
+                    datapool.cols[z] = dp.getColHeaders(0).getHeader(z).getName();
+                }
+                //set rows data
+                var rows = [];
+
+                (me.getProperty("showDebugMsgs") == 'true') ? window.alert('getRowHeaders: ' + dp.getRowHeaders(0).getHeader(0).getName()): 0;
+                (me.getProperty("showDebugMsgs") == 'true') ? window.alert('getRowHeaders1: ' + dp.getRowHeaders(0).getHeader(1).getName()): 0;
+
+
+                (me.getProperty("showDebugMsgs") == 'true') ? window.alert('new be4 c.startdate: ' + JSON.stringify(dp.getRowHeaders(0).getHeader(0).getName())): 0;
+                (me.getProperty("showDebugMsgs") == 'true') ? window.alert('new be4 c.enddate: ' + JSON.stringify(dp.getRowHeaders(0).getHeader(1).getName())): 0;
+
+                //go thru all rows
+                for (i = 0; i < dp.getTotalRows(); i++) {
+                    var c = {}
+                    // Attribute.Values: get date from data. date needs to be in the form of dd.MM.yy(yy)
+                   
+
+                    //c.attributes = [];
+                    // Attribute.Values: get the attribute values. Z=AttrCount so the first iteration is skipped IF the first attribute is a date and therefore it should be in c.startdate
+                    //for (var z = AttrCount; z < dp.getRowTitles().size(); z++) {
+                    for (var z = 0; z < dp.getRowTitles().size(); z++) {
+                        c[dp.getRowTitles(0).getTitle(z).getName()] = dp.getRowHeaders(i).getHeader(z).getName()
+                    }
+
+                    //c.values = [];
+                    // Metric.Values: get the metric values.
+                    for (var z = 0; z < dp.getColumnHeaderCount(); z++) {
+                        //c['values' + z] = dp.getMetricValue(i, z).getRawValue()
+                        //getMetricValue raw
+                        c[dp.getColHeaders(0).getHeader(z).getName() + '_raw'] = dp.getMetricValue(i, z).getRawValue()
+                        //getMetricValue formatted
+                        c[dp.getColHeaders(0).getHeader(z).getName()] = dp.getMetricValue(i, z).getValue()
+                    }
+                    // push c to current position in rows-Array. Meaning c.startdate, c.enddate and c.values, resulting in {"date" : "yyyy-mm-ddTHH:mm:ss.000Z" , "values" : 123 , "values0" : 456}
+                    rows[i] = c;
+                };
+                //window.alert('new after c.startdate: ' + JSON.stringify(rows[0]));
+                datapool.rows = rows;
+                //------------------ POPUP for Debugging INPUT ------------------//
+                var Say1 = 'DataPool: \n datapool.cols: ' + JSON.stringify(datapool.cols) + '\n datapool.attrs: ' + JSON.stringify(datapool.attrs);
+                //var Say2 = "datapool.rows:";
+                //var Say2 = "datapool: " + JSON.stringify(datapool);
+                //var Say2 = "dataraw: " + JSON.stringify(dataraw);             
+                //var Say2 = "datarows_adv: " + JSON.stringify(datarows_adv);
+                var Say2 = "datatree: " + JSON.stringify(datatree);
+
+                var myWindow2 = (me.getProperty("showDebugMsgs") == 'true') ? PopUp(Say1, Say2, datapool.rows) : 0;
+                var myWindow3 = (me.getProperty("showDebugTbl") == 'true') ? PopUp(Say1, Say2, datapool.rows) : 0;
+
+                return datapool;
+            };
+
+
+
+
+                
 
 
 
@@ -155,18 +247,11 @@
 
 
 
-
-
-
-
-
-
-
-                // NOTE prepareData()
+                // NOTE prepareData() // WITH DATETIME HANLDER AND Break-By
                 // https://www2.microstrategy.com/producthelp/2020/VisSDK/Content/topics/HTML5/DataInterfaceAPI.htm
                 // https://www2.microstrategy.com/producthelp/Current/VisSDK/Content/topics/HTML5/DataInterfaceAPI.htm#DataInterface
                 // https://lw.microstrategy.com/msdz/MSDL/GARelease_Current/_GARelease_Archives/103/docs/projects/VisSDK_All/Default.htm#topics/HTML5/Data_Interface_API.htm
-                function prepareData() {
+                function p77repareData() {
                     // Date Start and End Function! This function assumes first and second input to be of the date- or datetime-format!!
                     // Create a new array (datapool) and push the objects datarecords to the new array. each datarecord is one single object in the array.
                     // additional a check on "how many attributes?" and "how many metrics are being used?" must be performed to derive the FOR-Indicators
@@ -265,6 +350,8 @@
                     for (i = 0; i < dp.getTotalRows(); i++) {
                         var c = {}
                         // Attribute.Values: get date from data. date needs to be in the form of dd.MM.yy(yy)
+
+                        //--> DateTime Formatting and Preparation: Prepare JSON.Time Object
                         c.startdate = dp.getRowHeaders(i).getHeader(0).getName();
                         c.enddate = dp.getRowHeaders(i).getHeader(1).getName();
 
@@ -329,20 +416,21 @@
                         c[dp.getRowTitles(0).getTitle(1).getName()] = c.enddate;
                         delete c.startdate;
                         delete c.enddate;
+                        //<-- DateTime Formatting and Preparation: Prepare JSON.Time Object
 
-
-                        c.attributes = [];
+                        //c.attributes = [];
                         // Attribute.Values: get the attribute values. Z=AttrCount so the first iteration is skipped IF the first attribute is a date and therefore it should be in c.startdate
-                        for (var z = AttrCount; z < dp.getRowTitles().size(); z++) {
+                        //for (var z = AttrCount; z < dp.getRowTitles().size(); z++) {
+                        for (var z = 0; z < dp.getRowTitles().size(); z++) {
                             c[dp.getRowTitles(0).getTitle(z).getName()] = dp.getRowHeaders(i).getHeader(z).getName()
                         }
 
-                        c.values = [];
+                        //c.values = [];
                         // Metric.Values: get the metric values.
                         for (var z = 0; z < dp.getColumnHeaderCount(); z++) {
                             //c['values' + z] = dp.getMetricValue(i, z).getRawValue()
                             //getMetricValue raw
-                            //c[dp.getColHeaders(0).getHeader(z).getName()] = dp.getMetricValue(i, z).getRawValue()
+                            c[dp.getColHeaders(0).getHeader(z).getName()+'_raw'] = dp.getMetricValue(i, z).getRawValue()
                             //getMetricValue formatted
                             c[dp.getColHeaders(0).getHeader(z).getName()] = dp.getMetricValue(i, z).getValue()
                         }
@@ -393,12 +481,45 @@
 
                     //------------------ POPUP for Debugging INPUT ------------------//
                     var Say1 = 'DataPool: \n datapool.cols: ' + JSON.stringify(datapool.cols) + '\n datapool.attrs: ' + JSON.stringify(datapool.attrs);
-                    var Say2 = "datapool.rows:";
+                    //var Say2 = "datapool.rows:";
+                    //var Say2 = "datapool: " + JSON.stringify(datapool);
+                    //var Say2 = "datapool: " + JSON.stringify(dataraw);              
+                    var Say2 = "datapool: " + JSON.stringify(data2);
+
                     var myWindow2 = (me.getProperty("showDebugMsgs") == 'true') ? PopUp(Say1, Say2, datapool.rows) : 0;
                     var myWindow3 = (me.getProperty("showDebugTbl") == 'true') ? PopUp(Say1, Say2, datapool.rows) : 0;
 
                     return datapool;
                  };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// POPUP for Debugging INPUT ------------------------------------------------------------------------------------------------------------------------------//
+// --------------------------------------------------------------------------------------------------------------------------------------------------------//
 
                  //------------------ POPUP for Debugging INPUT ------------------//
                  // var Say1 = 'metricColors: <br>' + JSON.stringify(metricColors)

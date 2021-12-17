@@ -84,16 +84,6 @@
                                     }]
                                 }]
                             },
-                            {
-                                style: $WT.EDITORGROUP,
-                                items: [
-                                    {
-                                        style: $WT.CHECKBOXANDLABEL,
-                                        propertyName: "showDebugMsgs",
-                                        labelText: "Show Debugger"
-                                    },
-                                ]
-                            },
                         ]
                     },
                     // Tab amCharts Timeline Format
@@ -116,6 +106,28 @@
                                             labelText: "Show Thresholds"
                                 }]
                                 }]
+                    },
+                    // NOTE Tab amCharts Help and Notes
+                    {
+                        name: 'Help and Notes',
+                        value: [{
+                            style: $WT.EDITORGROUP,
+                            items: [
+                                /*   {
+                                         style: $WT.LABEL,
+                                         labelText: "Version 1.54 (GitHub:RobjSky)"
+                                     }, */
+                                {
+                                    style: $WT.CHECKBOXANDLABEL,
+                                    propertyName: "showDebugMsgs",
+                                    labelText: "Show Debug Msg"
+                                }, {
+                                    style: $WT.CHECKBOXANDLABEL,
+                                    propertyName: "showDebugTbl",
+                                    labelText: "Show Debug Table"
+                                },
+                            ]
+                        }, ]
                     }
                 ]
             }
