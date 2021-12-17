@@ -52,6 +52,18 @@
                                     propertyName: "displayXYChartScrollbar",
                                     labelText: "Show XYChartScrollbar"
                                 }, {
+                                    style: $WT.CHECKBOXANDLABEL,
+                                    propertyName: "show1stDateLabel",
+                                    labelText: "Force 1st Date-Label"
+                                }, {
+                                    style: $WT.CHECKBOXANDLABEL,
+                                    propertyName: "showCurrent",
+                                    labelText: "Show Today"
+                                }, {
+                                    style: $WT.CHECKBOXANDLABEL,
+                                    propertyName: "forceTimeUnit",
+                                    labelText: "force Timeunit (Date = 1d and Datetime = 1min)"
+                                }, {
                                     style: $WT.TWOCOLUMN,
                                     items: [{
                                         style: $WT.LABEL,
@@ -79,7 +91,7 @@
                                     items: [{
                                         style: $WT.LABEL,
                                         width: "40%",
-                                        labelText: "DateTime Format (Separator doesnt matter)"
+                                        labelText: "Date Format"
                                     }, {
                                         style: $WT.PULLDOWN,
                                         width: "60%",
@@ -356,13 +368,62 @@
                                     },
                                 ]
                             },
-                            
+
+
+                            //baseInterval: Timeunit and count
+                            /*{
+                                style: $WT.EDITORGROUP,
+                                items: [{   style: $WT.LABEL,
+                                            labelText: "Baseinterval: timeUnit and count"
+                                        }, {
+                                            style: $WT.TWOCOLUMN,
+                                            items: [{
+                                                    style: $WT.LABEL,
+                                                    width: "30%",
+                                                    labelText: "timeUnit"
+                                                },
+                                                {
+                                                    style: $WT.PULLDOWN,
+                                                    width: "70%",
+                                                    disabled: this.getHost().getProperty('showInfobox') === "false",
+                                                    propertyName: "timeUnit",
+                                                    items: [{name: "minute", value: "minute"
+                                                        },  {name: "hour", value: "hour"
+                                                        },  {name: "day", value: "day"
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }, {
+                                            style: $WT.TWOCOLUMN,
+                                            items: [{
+                                                    style: $WT.LABEL,
+                                                    width: "30%",
+                                                    labelText: "Count"
+                                                },
+                                                {
+                                                    style: $WT.PULLDOWN,
+                                                    width: "70%",
+                                                    disabled: this.getHost().getProperty('showInfobox') === "false",
+                                                    propertyName: "timeUnitCount",
+                                                    items: [{name: "1", value: 1},
+                                                            {name: "3", value: "3"},
+                                                            {name: "5", value: "5"},
+                                                            {name: "10", value: "10"},
+                                                            {name: "15", value: "15"},
+                                                            {name: "30", value: "30"}
+                                                    ]
+                                                }
+                                            ]
+                                        },
+
+                                ]
+                            },*/
                         ]
                     },
-
                     // Tab amCharts Timeline Format
                     {
-                        name: 'amCharts Timeline Format',
+                        name: 'Color, Thresholds & Heatmap',
                         value: [
                                 //Thresholds
                                 {
@@ -413,9 +474,23 @@
                                                 propertyName: "threshold"
                                             }],
                                             multiSelect: false
-                                        },{
-                                            style: $WT.TWOCOLUMN,
-                                            items: [{
+                                        },
+                                    /*],    
+                                    style: $WT.EDITORGROUP,
+                                    items: [*/
+                                        
+                                    ]
+                                },
+                                {
+                                    style: $WT.EDITORGROUP,
+                                    items: [{
+                                                style: $WT.LABEL,
+                                                disabled: typeOfThreshold.threshold === "false",
+                                                labelText: "Heatrule"
+                                            },
+                                            {
+                                                style: $WT.TWOCOLUMN,
+                                                items: [{
                                                     style: $WT.LABEL,
                                                     disabled: typeOfThreshold.heatrule === "false",
                                                     width: "30%",
@@ -425,11 +500,10 @@
                                                     disabled: typeOfThreshold.heatrule === "false",
                                                     width: "70%",
                                                     propertyName: "minThresholdColor",
-                                                }
-                                            ]
-                                        },{
-                                            style: $WT.TWOCOLUMN,
-                                            items: [{
+                                                }]
+                                            }, {
+                                                style: $WT.TWOCOLUMN,
+                                                items: [{
                                                     style: $WT.LABEL,
                                                     disabled: typeOfThreshold.heatrule === "false",
                                                     width: "30%",
@@ -439,12 +513,11 @@
                                                     disabled: typeOfThreshold.heatrule === "false",
                                                     width: "70%",
                                                     propertyName: "maxThresholdColor",
-                                                }
-                                            ]
-                                        },{
-                                            //minThresholdValue
-                                            style: $WT.TWOCOLUMN,
-                                            items: [{
+                                                }]
+                                            }, {
+                                                //minThresholdValue
+                                                style: $WT.TWOCOLUMN,
+                                                items: [{
                                                     style: $WT.LABEL,
                                                     disabled: typeOfThreshold.heatrule === "false",
                                                     width: "30%",
@@ -454,12 +527,11 @@
                                                     disabled: typeOfThreshold.heatrule === "false",
                                                     width: "70%",
                                                     propertyName: "minThresholdValue",
-                                                }
-                                            ]
-                                        },{
-                                            //maxThresholdValue
-                                            style: $WT.TWOCOLUMN,
-                                            items: [{
+                                                }]
+                                            }, {
+                                                //maxThresholdValue
+                                                style: $WT.TWOCOLUMN,
+                                                items: [{
                                                     style: $WT.LABEL,
                                                     disabled: typeOfThreshold.heatrule === "false",
                                                     width: "30%",
@@ -469,99 +541,118 @@
                                                     disabled: typeOfThreshold.heatrule === "false",
                                                     width: "70%",
                                                     propertyName: "maxThresholdValue",
-                                                }
-                                            ]
-                                        },{
-                                            // threshold0Color
-                                            style: $WT.TWOCOLUMN,
-                                            disabled: this.getHost().getProperty('showThreshold') === "false",
-                                            items: [{
-                                                style: $WT.LABEL,
-                                                disabled: typeOfThreshold.threshold === "false",
-                                                width: "40%",
-                                                labelText: "< Threshold1"
-                                            }, {
-                                                style: $WT.FILLGROUP,
-                                                disabled: typeOfThreshold.threshold === "false",
-                                                width: "60%",
-                                                propertyName: "threshold0Color",
-                                            }]
-                                        },{
-                                            style: $WT.EDITORGROUP,
-                                            items: (function () {
-                                                let y = [];
-                                                let x = [{
-                                                    style: $WT.LABEL,
-                                                    labelText: "Threshold 1"
-                                                }, {
-                                                    style: $WT.PULLDOWN,
-                                                    width: "100%",
-                                                    disabled: typeOfThreshold.threshold === "false",
-                                                    propertyName: "threshold1",
-                                                    items: y
-                                                }];
-                                                for (let i = 0; i < numOfMetrics; i++) {
-                                                    y.push({
-                                                        name: myViz.zonesModel.getDropZones().zones[4].items[i].n,
-                                                        value: i
-                                                    });
-                                                }
-                                                return x;
-                                            })()
-                                        },{
-                                            // threshold1Color
-                                            style: $WT.TWOCOLUMN,
-                                            disabled: this.getHost().getProperty('showThreshold') === "false",
-                                            items: [{
-                                                style: $WT.LABEL,
-                                                disabled: typeOfThreshold.threshold === "false",
-                                                width: "40%",
-                                                labelText: "between 1 & 2"
-                                            }, {
-                                                style: $WT.FILLGROUP,
-                                                disabled: typeOfThreshold.threshold === "false",
-                                                width: "60%",
-                                                propertyName: "threshold1Color",
-                                            }]
-                                        },{
-                                            style: $WT.EDITORGROUP,
-                                            items: (function () {
-                                                let y = [];
-                                                let x = [{
-                                                    style: $WT.LABEL,
-                                                    labelText: "\n.:: Threshold 2"
-                                                }, {
-                                                    style: $WT.PULLDOWN,
-                                                    width: "100%",
-                                                    disabled: typeOfThreshold.threshold === "false",
-                                                    propertyName: "threshold2",
-                                                    items: y
-                                                }];
-                                                for (let i = 0; i < numOfMetrics; i++) {
-                                                    y.push({
-                                                        name: myViz.zonesModel.getDropZones().zones[4].items[i].n,
-                                                        value: i
-                                                    });
-                                                }
-                                                return x;
-                                            })()
-                                        },{
-                                            // threshold2Color
-                                            style: $WT.TWOCOLUMN,
-                                            items: [{
-                                                style: $WT.LABEL,
-                                                disabled: typeOfThreshold.threshold === "false",
-                                                width: "40%",
-                                                labelText: "> Threshold2"
-                                            }, {
-                                                style: $WT.FILLGROUP,
-                                                disabled: typeOfThreshold.threshold === "false",
-                                                width: "60%",
-                                                propertyName: "threshold2Color",
-                                            }]
-                                        },
+                                                }]
+                                            },
                                     ]
                                 },
+                                {
+                                    style: $WT.EDITORGROUP,
+                                    items: [{
+                                        style: $WT.LABEL,
+                                        disabled: typeOfThreshold.threshold === "false",
+                                        labelText: "Thresholds"
+                                    },
+                                    {
+                                        // threshold0Color
+                                        style: $WT.TWOCOLUMN,
+                                        disabled: this.getHost().getProperty('showThreshold') === "false",
+                                        items: [{
+                                            style: $WT.LABEL,
+                                            disabled: typeOfThreshold.threshold === "false",
+                                            width: "40%",
+                                            labelText: "< Threshold1"
+                                        }, {
+                                            style: $WT.FILLGROUP,
+                                            disabled: typeOfThreshold.threshold === "false",
+                                            width: "60%",
+                                            propertyName: "threshold0Color",
+                                        }]
+                                    }, {
+                                        style: $WT.EDITORGROUP,
+                                        items: (function () {
+                                            let y = [];
+                                            let x = [{
+                                                style: $WT.LABEL,
+                                                labelText: "Threshold 1"
+                                            }, {
+                                                style: $WT.PULLDOWN,
+                                                width: "100%",
+                                                disabled: typeOfThreshold.threshold === "false",
+                                                propertyName: "threshold1",
+                                                items: y
+                                            }];
+                                            for (let i = 0; i < numOfMetrics; i++) {
+                                                y.push({
+                                                    name: myViz.zonesModel.getDropZones().zones[4].items[i].n,
+                                                    value: i
+                                                });
+                                            }
+                                            return x;
+                                        })()
+                                    }, {
+                                        // threshold1Color
+                                        style: $WT.TWOCOLUMN,
+                                        disabled: this.getHost().getProperty('showThreshold') === "false",
+                                        items: [{
+                                            style: $WT.LABEL,
+                                            disabled: typeOfThreshold.threshold === "false",
+                                            width: "40%",
+                                            labelText: "between 1 & 2"
+                                        }, {
+                                            style: $WT.FILLGROUP,
+                                            disabled: typeOfThreshold.threshold === "false",
+                                            width: "60%",
+                                            propertyName: "threshold1Color",
+                                        }]
+                                    }, {
+                                        style: $WT.EDITORGROUP,
+                                        items: (function () {
+                                            let y = [];
+                                            let x = [{
+                                                style: $WT.LABEL,
+                                                labelText: "\n.:: Threshold 2"
+                                            }, {
+                                                style: $WT.PULLDOWN,
+                                                width: "100%",
+                                                disabled: typeOfThreshold.threshold === "false",
+                                                propertyName: "threshold2",
+                                                items: y
+                                            }];
+                                            for (let i = 0; i < numOfMetrics; i++) {
+                                                y.push({
+                                                    name: myViz.zonesModel.getDropZones().zones[4].items[i].n,
+                                                    value: i
+                                                });
+                                            }
+                                            return x;
+                                        })()
+                                    },
+                                    {
+                                        // threshold2Color
+                                        style: $WT.TWOCOLUMN,
+                                        items: [{
+                                            style: $WT.LABEL,
+                                            disabled: typeOfThreshold.threshold === "false",
+                                            width: "40%",
+                                            labelText: "> Threshold2"
+                                        }, {
+                                            style: $WT.FILLGROUP,
+                                            disabled: typeOfThreshold.threshold === "false",
+                                            width: "60%",
+                                            propertyName: "threshold2Color",
+                                        }]
+                                    },
+                                    ]
+                                },
+
+
+                                ]
+                                },
+
+                                // Tab amCharts Timeline Format
+                                {
+                                    name: 'Grid, Axis & Clicks',
+                                    value: [
                                 //Grid and Axis Lines
                                 {
                                     style: $WT.EDITORGROUP,
@@ -711,7 +802,7 @@
                         name: 'Help and Notes',
                         value: [{
                                 style: $WT.LABEL,
-                                labelText: "Version 1.45    (GitHub:RobjSky)"
+                                labelText: "Version 1.59    (GitHub:RobjSky)"
                             }, {
                                 style: $WT.CHECKBOXANDLABEL,
                                 propertyName: "showDebugMsgs",
@@ -722,7 +813,13 @@
                                 labelText: "Show Debug Table"
                             }, {
                                 style: $WT.LABEL,
-                                labelText: "Help: Date Start and End Function! This function assumes first and second input to be of the date- or datetime-format! Date needs to be in the form of dd.mm.yy(yy) DateTime needs to be in the form of dd.mm.yy(yy) hh:mm:ss"
+                                labelText: "Help:"
+                            }, {
+                                style: $WT.LABEL,
+                                labelText: "Date Start and End Function! This function assumes first and second input to be of the date- or datetime-format! Date and DateTime need to be in one of the supported formats. Supported separators for date are: , - . / \ : and [Whitespace]"
+                            }, {
+                                style: $WT.LABEL,
+                                labelText: "Sorting by Start DateTime Attribute is very important."
                             },
                         ]
                     }
