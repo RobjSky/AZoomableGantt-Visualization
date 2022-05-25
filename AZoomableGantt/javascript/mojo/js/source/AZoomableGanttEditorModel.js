@@ -820,6 +820,9 @@
                             }, {
                                 style: $WT.LABEL,
                                 labelText: "Sorting by Start DateTime Attribute is very important."
+                            }, {
+                                style: $WT.LABEL,
+                                labelText: "When Sorting by something else, the sorting needs to be first by the desired attribute but then by the time attribute. Also the 'force timeunit' option needs to be set."
                             },
                         ]
                     }

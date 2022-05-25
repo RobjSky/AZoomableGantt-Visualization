@@ -71,7 +71,7 @@
                     minGridDist: 70, //actual default for Y-Axis
                     displayImage: 'false',
                     heightImg: 60,
-                    imgPrefix: 'http://bi.kinopolis.de/MicroStrategy/images/kinopolis/film_no/',
+                    imgPrefix: 'http://my.company.com/MicroStrategy/images/company/no/',
                     imgSuffix: '.jpg',
                     fontColor: {fillColor: "#000000", fillAlpha: "100"},
                     clickTask: 'false',
@@ -670,8 +670,6 @@
                             var img = info.createChild(am4core.Image);
                             var imgPrefix = me.getProperty("imgPrefix");
                             var imgSuffix = me.getProperty("imgSuffix");
-                            // var imgPrefix = 'http://bi.kinopolis.de/MicroStrategy/images/kinopolis/film_no/'
-                            //img.href = "https://alternativemovieposters.com/wp-content/uploads/2020/09/BATMAN-1989-30x30-1.jpg";
                             img.width = am4core.percent(100);
                             img.height = me.getProperty("heightImg");
                             img.align = "center";
